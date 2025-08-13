@@ -1,0 +1,80 @@
+Scalable Frontend Application Development Flow
+===============================================
+
+1️⃣ Planning & Project Setup
+----------------------------
+→ Choose the framework (active development, community support, libraries)
+→ Define efficient folder structure (splits by features,logic, reusable, Git ignores)
+→ Decide naming conventions (PascalCase --components,props etc, camelCase -- data, kebab-case -- urls,file/folder names etc.)
+→ Set up style guides and linters (ESLint, Prettier)
+→ Configure TypeScript for static type checks
+→ Plan CSS strategy (BEM, CSS modules, Tailwind CSS)
+
+2️⃣ Development Best Practices
+------------------------------
+→ Apply Single Responsibility Principle (functions/components)
+→ Avoid deep nesting
+→ Follow DRY (reusable components/functions in common/utils)
+→ Write modular, reusable, maintainable code
+→ Follow clean code principles
+→ Use responsive design & mobile-first approach
+
+3️⃣ Performance Optimization During Development
+------------------------------------------------
+→ Lazy loading (images, data, components)
+→ Code splitting, minification, compression
+→ Debounce/throttle for optimized interactions
+
+4️⃣ Pre-Commit & Quality Checks
+-------------------------------
+→ Husky/pre-commit hooks to run:
+    - Lint checks
+    - Code formatting
+    - Automated tests (unit/integration/E2E)
+→ Commit only if checks pass
+→ Update documentation (Confluence, Google Docs)
+
+5️⃣ Post-Commit & Review Process
+--------------------------------
+→ Code reviews
+→ Design reviews
+→ QA testing (sanity/feature)
+
+6️⃣ Deployment
+--------------
+→ Deploy after tests, reviews, and performance checks pass
+→ Use CI/CD pipelines for consistency
+
+7️⃣ Monitor & Maintain
+----------------------
+→ Keep libraries/frameworks updated
+→ DAILY: Monitor site performance metrics
+→ WEEKLY: Check error logs (Sentry)
+→ MONTHLY: Analyze user feedback, reviews, surveys
+→ QUARTERLY: Performance audits & design refactoring
+→ Act on feedback loops
+→ Schedule code cleanup & refactoring
+
+
+
+
+
+Scalable frontend application : 
+1/ https://dev.to/amirrezasalimi/modular-architecture-for-scalable-frontend-development-2emb 
+- For files & folder follow the kebab-case, keep every file within a module/folder
+- Create folder for features, keep features level folders like components, utility functions, hooks, constants, stores. We can have the same at project level.
+- Clear variable, component, file/folder names reduces the cognitive load
+2/ Frontend scale
+- https://frontendatscale.com/issues/1/
+- Title : all about complexity
+- 1/ what is complexity -> Anything that make codebase —> harder to change/understand, high cognitive load(unclear variable, file, folder or component names, unorganised codebase), unknown unknown effects, changes amplification
+- https://frontendatscale.com/issues/3 
+- Title : Technical depth and breadth 
+- 1/ stuffs u know — depth, stuffs u know, u don’t know — breadth
+- 2/ Visualise the architecture before building to get better clarity, even at feature/project level
+
+3/ https://aglowiditsolutions.com/blog/scaling-frontend-architecture/ 
+4/ https://www.webelight.com/blog/the-ctos-guide-to-building-a-scalable-frontend-for-enterprise-applications 
+5/ https://namastedev.com/blog/frontend-architecture-for-scalable-apps-3/ 
+6/ https://www.animaapp.com/blog/enterprise/modernize-frontend-in-2025-future-proof-your-web-and-app-development/ 
+7/ https://dev.to/istealersn_dev/architecting-scalable-frontend-systems-2fpj 
