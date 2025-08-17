@@ -3,16 +3,62 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 30, 41, 59;
+  --background-start-rgb: 248, 250, 252;
+  --background-end-rgb: 241, 245, 249;
+  
+  /* Primary colors */
+  --primary: 37, 99, 235;
+  --primary-foreground: 255, 255, 255;
+  
+  /* Secondary colors */
+  --secondary: 100, 116, 139;
+  --secondary-foreground: 255, 255, 255;
+  
+  /* Accent colors */
+  --accent: 124, 58, 237;
+  --accent-foreground: 255, 255, 255;
+  
+  /* Card colors */
+  --card: 255, 255, 255;
+  --card-foreground: 30, 41, 59;
+  
+  /* Border colors */
+  --border: 226, 232, 240;
+  
+  /* Muted colors */
+  --muted: 241, 245, 249;
+  --muted-foreground: 100, 116, 139;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 241, 245, 249;
+    --background-start-rgb: 15, 23, 42;
+    --background-end-rgb: 30, 41, 59;
+    
+    /* Primary colors */
+    --primary: 59, 130, 246;
+    --primary-foreground: 255, 255, 255;
+    
+    /* Secondary colors */
+    --secondary: 148, 163, 184;
+    --secondary-foreground: 15, 23, 42;
+    
+    /* Accent colors */
+    --accent: 139, 92, 246;
+    --accent-foreground: 255, 255, 255;
+    
+    /* Card colors */
+    --card: 30, 41, 59;
+    --card-foreground: 241, 245, 249;
+    
+    /* Border colors */
+    --border: 51, 65, 85;
+    
+    /* Muted colors */
+    --muted: 51, 65, 85;
+    --muted-foreground: 148, 163, 184;
   }
 }
 
@@ -24,4 +70,36 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+/* Custom styles for better UI */
+.tab-highlight {
+  @apply relative overflow-hidden transition-all;
+}
+
+.tab-highlight::after {
+  content: '';
+  @apply absolute bottom-0 left-0 h-0.5 w-full bg-primary transform scale-x-0 transition-transform duration-300;
+}
+
+.tab-highlight[data-state="active"]::after {
+  @apply scale-x-100;
+}
+
+.back-button {
+  @apply flex items-center gap-1 text-sm font-medium text-secondary-foreground hover:text-primary transition-colors mb-4;
+}
+
+/* Code block styling */
+pre {
+  @apply rounded-lg bg-slate-900 p-4 overflow-x-auto;
+}
+
+code {
+  @apply text-sm font-mono;
+}
+
+/* Improved card styling */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:border-primary/20;
 }
