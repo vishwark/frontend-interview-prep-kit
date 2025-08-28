@@ -9,6 +9,7 @@ Scalable Frontend Application Development Flow
 → Set up style guides and linters (ESLint, Prettier)
 → Configure TypeScript for static type checks
 → Plan CSS strategy (BEM, CSS modules, Tailwind CSS)
+→ Design tokens are the building blocks of a design system. They ensure consistency, scalability, and maintainability of UI design across platforms.
 
 2️⃣ Development Best Practices
 ------------------------------

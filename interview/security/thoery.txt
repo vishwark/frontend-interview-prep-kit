@@ -1,0 +1,150 @@
+=========================
+FRONTEND WEB SECURITY CHECKLIST
+=========================
+
+Priority Order: High → Low
+Designed for React / Vue developers
+
+-------------------------------------------------------
+1) HTTPS Everywhere (Transport Security)
+-------------------------------------------------------
+- Serve app only over HTTPS.
+- Enable HSTS:
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+- Avoid mixed content (HTTP images/scripts on HTTPS pages).
+- Use HTTPS locally where possible for dev/test.
+
+-------------------------------------------------------
+2) Authentication & Session Security
+-------------------------------------------------------
+- Use HttpOnly + Secure cookies for session/refresh tokens.
+- Enable SameSite=Strict or Lax cookies.
+- Expire sessions after inactivity.
+- Logout: clear cookies and in-memory state.
+- Never expose secrets in frontend bundle; use backend proxy.
+- React/Vue tip: keep access token in memory, refresh via HttpOnly cookie.
+
+-------------------------------------------------------
+3) XSS Prevention & Core Headers
+-------------------------------------------------------
+- Never render untrusted HTML directly.
+  React: avoid dangerouslySetInnerHTML unless sanitized with DOMPurify.
+  Vue: avoid v-html unless sanitized.
+- Content Security Policy (CSP):
+  Content-Security-Policy:
+    default-src 'self';
+    script-src 'self' 'strict-dynamic';
+    object-src 'none';
+    base-uri 'self';
+    frame-ancestors 'none';
+    img-src 'self' data:;
+    style-src 'self' 'unsafe-inline';
+    connect-src 'self' https://api.your-backend.com;
+    upgrade-insecure-requests;
+- X-Content-Type-Options: nosniff
+- Referrer-Policy: strict-origin-when-cross-origin
+
+-------------------------------------------------------
+4) CSRF Defense
+-------------------------------------------------------
+- Use CSRF tokens for state-changing requests.
+- Use SameSite cookies.
+- Confirm destructive actions with user.
+- React/Vue example (axios):
+  axios.post('/api/delete', payload, {
+    withCredentials: true,
+    headers: { 'X-CSRF-Token': getTokenFromCookieOrMeta() }
+  });
+
+-------------------------------------------------------
+5) CORS (Cross-Origin Resource Sharing)
+-------------------------------------------------------
+- Allow only trusted origins; avoid '*'.
+- Enable credentials only if needed:
+  Access-Control-Allow-Origin: https://app.yoursite.com
+  Vary: Origin
+  Access-Control-Allow-Credentials: true
+  Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE
+  Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token
+
+-------------------------------------------------------
+6) Cross-Origin Isolation (CORP, COEP, COOP)
+-------------------------------------------------------
+- Cross-Origin-Opener-Policy: same-origin
+- Cross-Origin-Embedder-Policy: require-corp
+- Cross-Origin-Resource-Policy: same-origin (or same-site / cross-origin as needed)
+- Ensure all embedded resources (fonts, images, iframes) comply.
+
+-------------------------------------------------------
+7) API Communication Security
+-------------------------------------------------------
+- Use HTTPS only.
+- Authenticate all API calls (JWT / cookie).
+- Use short-lived access tokens with refresh.
+- Handle 401/419 globally; retry after refresh.
+- Server should enforce rate-limiting and validation.
+
+-------------------------------------------------------
+8) Dependency & Supply Chain Security
+-------------------------------------------------------
+- Run npm audit / yarn audit in CI.
+- Use Dependabot / Snyk.
+- Lock versions (package-lock.json / yarn.lock).
+- Avoid abandoned / untrusted libraries.
+- Review post-install scripts for unknown packages.
+
+-------------------------------------------------------
+9) Sensitive Data Exposure
+-------------------------------------------------------
+- Never include secrets in frontend bundle.
+- Use backend proxy for third-party API keys.
+- Mask sensitive fields in UI (passwords, cards).
+- Avoid putting PII in URLs or logs.
+
+-------------------------------------------------------
+10) Error Handling & Logging
+-------------------------------------------------------
+- Show generic user-facing messages: “Something went wrong”.
+- Catch errors via React Error Boundaries / Vue errorHandler.
+- Send sanitized error telemetry to backend.
+- Do not expose stack traces in production.
+
+-------------------------------------------------------
+11) Advanced Browser Protections
+-------------------------------------------------------
+- Permissions-Policy: disable unused APIs
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=()
+- Subresource Integrity (SRI) for third-party scripts/styles:
+  <script src="https://cdn.example.com/lib.js"
+          integrity="sha384-BASE64HASH"
+          crossorigin="anonymous"></script>
+- Clickjacking protection:
+  CSP frame-ancestors 'none' OR X-Frame-Options: DENY
+
+-------------------------------------------------------
+Recommended Headers (copy-paste to server / CDN)
+-------------------------------------------------------
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Content-Security-Policy: default-src 'self'; script-src 'self' 'strict-dynamic'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.your-backend.com; upgrade-insecure-requests
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+Access-Control-Allow-Origin: https://app.yoursite.com
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE
+Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token
+
+-------------------------------------------------------
+React / Vue Implementation Nuggets
+-------------------------------------------------------
+- Global API client with auth headers + CSRF automatically attached.
+- Wrap all HTML injection with DOMPurify or equivalent.
+- In-memory access token + HttpOnly refresh token strategy.
+- Route guards for private routes (frontend only, always validate on server).
+- Central error boundary / handler for SPA, send sanitized telemetry.
+
+=========================
+END OF CHECKLIST
+=========================
