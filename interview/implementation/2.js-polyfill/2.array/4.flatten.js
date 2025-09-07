@@ -16,7 +16,7 @@
  * Edge Cases:
  * - If depth is 0, the original array is returned as a shallow copy
  * - If depth is negative, the original array is returned as a shallow copy
- * - Empty slots in arrays are preserved
+ * - Empty slots in arrays are preserved at nested level where flattening not applied
  */
 
 if (!Array.prototype.flat) {
@@ -45,6 +45,31 @@ if (!Array.prototype.flat) {
     );
   };
 }
+
+if (!Array.prototype.flat) {
+  Array.prototype.flat = function (depth = 1) {
+    // If depth is less than 1, just return a shallow copy of the array
+    // Example: [1, [2]].flat(0) → [1, [2]]
+    if (depth < 1) return [...this];
+
+    // Use reduce to accumulate flattened results
+    return this.reduce((acc, cur) => {
+      // If current element is an array AND depth > 0, flatten it recursively
+      if (Array.isArray(cur)) {
+        // Call flat again on the sub-array with depth - 1
+        // Spread (...) ensures elements are pushed individually, not as a nested array
+        acc.push(...cur.flat(depth - 1));
+      } else {
+        // If it's not an array, just push the value directly
+        acc.push(cur);
+      }
+
+      // Return the accumulator for the next iteration
+      return acc;
+    }, []); // Start reduce with an empty array
+  };
+}
+
 
 /**
  * Array.prototype.flatMap() Polyfill
@@ -75,6 +100,6 @@ if (!Array.prototype.flatMap) {
     }
 
     // First map, then flat with depth 1
-    return Array.prototype.map.call(this, callback, thisArg).flat(1);
+    return this.map(callback, thisArg).flat(1);
   };
 }

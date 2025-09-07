@@ -20,59 +20,31 @@
  * - Primitive values are converted to objects when passed as thisArg in non-strict mode
  */
 
-if (!Function.prototype._apply) {
-  // Store the original apply method if it exists
-  Function.prototype._apply = Function.prototype.apply;
-  
-  Function.prototype.apply = function(thisArg, argsArray) {
-    // If the original apply method exists, use it
-    if (typeof this._apply === 'function') {
-      return this._apply.call(this, thisArg, argsArray);
+if (!Function.prototype.apply) {
+  Function.prototype.apply = function (thisArg, argsArray) {
+    // 1. Ensure 'this' is a function
+    if (typeof this !== "function") {
+      throw new TypeError(this + " is not callable");
     }
-    
-    // If the function being called is not actually a function
-    if (typeof this !== 'function') {
-      throw new TypeError(this + ' is not a function');
-    }
-    
-    // Handle null or undefined thisArg in non-strict mode
-    thisArg = thisArg === null || thisArg === undefined ? 
-              (typeof window !== 'undefined' ? window : global) : 
-              Object(thisArg);
-    
-    // Create a unique property name to avoid overwriting existing properties
-    const uniqueProp = '_' + Math.random().toString(36).substr(2, 9);
-    
-    // Store the function as a property of thisArg
-    thisArg[uniqueProp] = this;
-    
-    // Handle the case where argsArray is not provided or is null/undefined
-    let result;
-    if (argsArray === undefined || argsArray === null) {
-      result = thisArg[uniqueProp]();
-    } else {
-      // Check if argsArray is array-like
-      if (typeof argsArray !== 'object' && typeof argsArray !== 'function') {
-        throw new TypeError('CreateListFromArrayLike called on non-object');
-      }
-      
-      const args = [];
-      const length = argsArray.length || 0;
-      
-      // Convert argsArray to a real array of arguments
-      for (let i = 0; i < length; i++) {
-        args.push('argsArray[' + i + ']');
-      }
-      
-      // Call the function with the arguments
-      // Using eval to dynamically create the function call with the arguments
-      result = eval('thisArg[uniqueProp](' + args.join(',') + ')');
-    }
-    
-    // Remove the temporary property
-    delete thisArg[uniqueProp];
-    
-    // Return the result
+
+    // 2. Handle null/undefined -> default to global object
+    thisArg = thisArg ?? (typeof window !== "undefined" ? window : global);
+
+    // 3. Convert to object (in case of primitives)
+    thisArg = Object(thisArg);
+
+    // 4. Create a temporary property on thisArg to hold the function
+    const fnKey = Symbol("fn");
+    thisArg[fnKey] = this;
+
+    // 5. Call the function with spread arguments
+    const result = argsArray ? thisArg[fnKey](...argsArray) : thisArg[fnKey]();
+
+    // 6. Remove the temporary property
+    delete thisArg[fnKey];
+
+    // 7. Return the result
     return result;
   };
 }
+

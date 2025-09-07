@@ -1,0 +1,37 @@
+===========================
+📌 JEST GLOBAL METHODS CHEATSHEET
+===========================
+
+1. TEST STRUCTURE
+-----------------
+test(name, fn) / it(name, fn)
+→ Defines a single test.
+
+describe(name, fn)
+→ Groups related tests together.
+
+VARIATIONS:
+-----------
+- test.only / it.only → run only this test
+- test.skip / it.skip → skip this test
+- test.todo → placeholder for future test
+- test.concurrent → run tests in parallel (async safe)
+- test.each(table) → run same test with multiple inputs
+
+EXAMPLE:
+test.each([
+  [1,2,3],
+  [2,3,5],
+])('adds %i + %i = %i', (a, b, expected) => {
+  expect(a + b).toBe(expected)
+})
+
+2. LIFECYCLE HOOKS
+------------------
+beforeAll(fn)   → runs once before all tests
+beforeEach(fn)  → runs before each test
+afterEach(fn)   → runs after each test
+afterAll(fn)    → runs once after all tests
+
+USECASE:
+- setup/cleanup (e.g., render components, reset mocks, DB setup)

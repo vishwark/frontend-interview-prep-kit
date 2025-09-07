@@ -1,0 +1,50 @@
+1/ Difference between Jest and RTL, usecases of each. Do they complement each other? 
+2/ what is flaky testing?
+3/ Can we skip RTL if we just need non-ui function/api implementations testing?
+4/ How to write the test cases?
+5/ what are the best practices for test cases in react based applications?
+6/ What are common mistakes that needs to be avoided for test cases?
+7/ What is snapshot testing?
+8/ What is assertion testing?
+9/ What are the difference between Snapshot and Assertion testing? When to use which one?
+10/ How to test things in a react way ? like components, hooks, utility, functions etc.
+
+
+
+1. Unit Tests (Base Layer — Jest)
+- Fast, isolated, no DOM needed.
+- Covers business logic, hooks, utils, API calls.
+- Example: calcDiscount(), useDebounce().
+- Ratio: ~60% of tests.
+
+2. Integration / Component Tests (Middle Layer — Jest + RTL)
+- Render components and simulate real user interactions.
+- Covers local state, props, UI behavior, global state providers (Redux/Context).
+- Example: “Clicking Add to Cart increases cart count.”
+- Ratio: ~30% of tests.
+
+3. End-to-End (E2E) Tests (Top Layer — Cypress/Playwright)
+- Run app in a browser → test full flows with real backend or mocked APIs.
+- Covers critical user journeys.
+- Example: “User can register → login → buy a product → see order confirmation.”
+- Ratio: ~10% of tests.
+
+
+             ┌── Is component static/visual only? ──┐
+             │                                      │
+            Yes                                    No
+             │                                      │
+   ┌─────────▼─────────┐                   ┌────────▼─────────┐
+   │ Use Snapshot Test │                   │ Has dynamic state│
+   └───────────────────┘                   │ or user behavior?│
+                                           └───────────-──────┘
+                                                    │
+                                                Yes │
+                                                    ▼
+                                            ┌───────────────────┐
+                                            │ Use Normal Test   │
+                                            │ (RTL assertions)  │
+                                            └───────────────────┘
+
+
+

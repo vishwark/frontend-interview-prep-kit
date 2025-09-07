@@ -21,48 +21,25 @@
  */
 
 if (!Function.prototype.bind) {
-  Function.prototype.bind = function(thisArg) {
-    // If the function being bound is not actually a function
-    if (typeof this !== 'function') {
-      throw new TypeError(this + ' is not a function');
+  Function.prototype.bind = function (thisArg, ...boundArgs) {
+    if (typeof this !== "function") {
+      throw new TypeError(this + " is not callable");
     }
-    
-    // Store the original function
-    const originalFunction = this;
-    
-    // Get the arguments to be prepended (excluding thisArg)
-    const boundArgs = Array.prototype.slice.call(arguments, 1);
-    
-    // Create a new function that will be returned
-    const boundFunction = function() {
-      // Get the arguments passed to the bound function
-      const args = Array.prototype.slice.call(arguments);
-      
-      // Combine the bound arguments with the new arguments
-      const allArgs = boundArgs.concat(args);
-      
-      // If the bound function is being used as a constructor (with 'new')
-      if (this instanceof boundFunction) {
-        // Create a new instance of the original function
-        // and pass the combined arguments
-        return originalFunction.apply(this, allArgs);
+
+    const originalFn = this;
+
+    function boundFn(...args) {
+      // If called with 'new', ignore thisArg and use the new instance
+      if (this instanceof boundFn) {
+        return new originalFn(...boundArgs, ...args);
       }
-      
-      // Otherwise, call the original function with the bound 'this' value
-      // and the combined arguments
-      return originalFunction.apply(thisArg, allArgs);
-    };
-    
-    // Create a new prototype object that inherits from the original function's prototype
-    if (originalFunction.prototype) {
-      // Use Object.create to create a new object with the original function's prototype
-      const Empty = function() {};
-      Empty.prototype = originalFunction.prototype;
-      boundFunction.prototype = new Empty();
-      // Restore the constructor property
-      boundFunction.prototype.constructor = boundFunction;
+      // Otherwise, call with given thisArg
+      return originalFn.apply(thisArg, [...boundArgs, ...args]);
     }
-    
-    return boundFunction;
+
+    // Preserve prototype chain for 'new' usage
+    boundFn.prototype = Object.create(originalFn.prototype);
+
+    return boundFn;
   };
 }

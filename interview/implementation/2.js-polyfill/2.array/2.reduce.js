@@ -22,6 +22,7 @@
  * - If the array is empty and no initialValue is provided, a TypeError is thrown
  * - If the array has only one element and no initialValue is provided, that single element is returned
  * - If initialValue is provided but the array is empty, the initialValue is returned
+ * - If the initialValue not provided, find the first non void value in array & set it to accumulator. 
  */
 
 if (!Array.prototype.reduce) {

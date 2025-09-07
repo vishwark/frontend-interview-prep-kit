@@ -18,46 +18,29 @@
  * - Primitive values are converted to objects when passed as thisArg in non-strict mode
  */
 
-if (!Function.prototype._call) {
-  // Store the original call method if it exists
-  Function.prototype._call = Function.prototype.call;
-  
-  Function.prototype.call = function(thisArg) {
-    // If the original call method exists, use it
-    if (typeof this._call === 'function') {
-      return this._call.apply(this, arguments);
+if (!Function.prototype.call) {
+  Function.prototype.call = function (thisArg, ...args) {
+    if (typeof this !== "function") {
+      throw new TypeError(this + " is not callable");
     }
-    
-    // If the function being called is not actually a function
-    if (typeof this !== 'function') {
-      throw new TypeError(this + ' is not a function');
-    }
-    
-    // Handle null or undefined thisArg in non-strict mode
-    thisArg = thisArg === null || thisArg === undefined ? 
-              (typeof window !== 'undefined' ? window : global) : 
-              Object(thisArg);
-    
-    // Create a unique property name to avoid overwriting existing properties
-    const uniqueProp = '_' + Math.random().toString(36).substr(2, 9);
-    
-    // Store the function as a property of thisArg
-    thisArg[uniqueProp] = this;
-    
-    // Get the arguments (excluding thisArg)
-    const args = [];
-    for (let i = 1; i < arguments.length; i++) {
-      args.push('arguments[' + i + ']');
-    }
-    
-    // Call the function and store the result
-    // Using eval to dynamically create the function call with the arguments
-    const result = eval('thisArg[uniqueProp](' + args.join(',') + ')');
-    
-    // Remove the temporary property
-    delete thisArg[uniqueProp];
-    
-    // Return the result
+
+    // Handle null/undefined → global object(node:global,browser:window,globalThis)
+    thisArg = thisArg ?? (typeof window !== "undefined" ? window : global);
+
+    // Convert to object (to support primitives like string/number)
+    thisArg = Object(thisArg);
+
+    // Create a temporary property to hold the function
+    const fnKey = Symbol("fn");
+    thisArg[fnKey] = this;
+
+    // Call the function
+    const result = thisArg[fnKey](...args);
+
+    // Remove temporary property
+    delete thisArg[fnKey];
+
     return result;
   };
 }
+

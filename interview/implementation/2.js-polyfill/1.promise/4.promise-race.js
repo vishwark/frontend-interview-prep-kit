@@ -8,7 +8,7 @@
  * whether it's fulfilled or rejected.
  * 
  * Parameters:
- * - promises: An iterable (such as an array) of promises
+ * - promises: An iterable (such as an array/set/generators etc) of promises
  * 
  * Returns:
  * - A Promise that fulfills or rejects as soon as one of the promises in the iterable fulfills or rejects,
@@ -18,6 +18,15 @@
  * - If the iterable is empty, the returned promise never settles
  * - Non-promise values in the iterable are automatically converted to resolved promises
  * - The first promise to settle (either fulfill or reject) determines the outcome
+ * 
+ * 
+ * 
+ * NOTE *
+ * Promise.all([]) → resolves immediately with [].
+ * Promise.any([]) → rejects immediately with an empty AggregateError.
+ * Promise.race([]) → stays pending forever.
+ * Promise.allSettled([]) → resolves immediately with [].
+ * 
  */
 
 if (!Promise.race) {

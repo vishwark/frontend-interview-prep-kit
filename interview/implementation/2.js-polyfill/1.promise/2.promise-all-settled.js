@@ -8,12 +8,12 @@
  * (either fulfilled or rejected), with an array of objects describing the outcome of each promise.
  * 
  * Parameters:
- * - promises: An iterable (such as an array) of promises
+ * - promises: An iterable (such as an array/set/generators etc) of promises
  * 
  * Returns:
  * - A Promise that fulfills with an array of objects, each describing the outcome of each promise:
- *   - For fulfilled promises: { status: 'fulfilled', value: <fulfillment value> }
- *   - For rejected promises: { status: 'rejected', reason: <rejection reason> }
+ *  - For fulfilled promises: { status: 'fulfilled', value: <fulfillment value> }
+ *  - For rejected promises: { status: 'rejected', reason: <rejection reason> }
  * 
  * Edge Cases:
  * - If the iterable is empty, it returns a promise that resolves to an empty array

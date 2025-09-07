@@ -1,0 +1,172 @@
+===========================
+📌 JEST MATCHERS CHEATSHEET
+===========================
+
+1. BASIC EQUALITY
+-----------------
+expect(value).toBe(4)              // strict equality (===)
+expect(obj).toEqual({a: 1})        // deep equality
+expect(value).not.toBe(0)          // negation
+
+WHEN TO USE:
+- Use `toBe` for primitives (number, string, boolean).
+- Use `toEqual` for arrays/objects.
+- Use `not` when checking something should not happen.
+
+2. TRUTHINESS
+-------------
+expect(null).toBeNull()
+expect(undefined).toBeUndefined()
+expect(value).toBeDefined()
+expect(value).toBeTruthy()
+expect(value).toBeFalsy()
+
+WHEN TO USE:
+- `toBeNull` when expecting null exactly.
+- `toBeUndefined` when testing missing props/vars.
+- `toBeTruthy`/`toBeFalsy` when only care about JS truthy/falsy.
+
+3. NUMBERS
+----------
+expect(10).toBeGreaterThan(5)
+expect(5).toBeLessThan(10)
+expect(3.14).toBeCloseTo(3.1, 1)
+
+WHEN TO USE:
+- Use comparison matchers for counters, timers, lengths.
+- Use `toBeCloseTo` for floating-point math.
+
+4. STRINGS
+----------
+expect('frontend').toMatch(/end$/)
+expect('hello world').toContain('world')
+
+WHEN TO USE:
+- Use `toMatch` with regex for patterns (email, url).
+- Use `toContain` for substring checks.
+
+5. ARRAYS & ITERABLES
+---------------------
+expect([1,2,3]).toContain(2)
+expect([{a:1}]).toContainEqual({a:1})
+
+WHEN TO USE:
+- `toContain` when checking for primitive in array.
+- `toContainEqual` when checking for object inside array.
+
+6. OBJECTS
+----------
+expect({a:1,b:2}).toHaveProperty('a')
+expect({a:1,b:2}).toHaveProperty('b', 2)
+expect({a:1,b:2}).toMatchObject({a:1})
+
+WHEN TO USE:
+- `toHaveProperty` when checking specific keys.
+- `toMatchObject` for partial matches (e.g. API response subset).
+
+7. EXCEPTIONS
+-------------
+function throwError() { throw new Error('Oops') }
+expect(throwError).toThrow()
+expect(throwError).toThrow('Oops')
+
+WHEN TO USE:
+- Use when testing error handling, validations, API failures.
+
+8. MOCK FUNCTIONS
+-----------------
+const mockFn = jest.fn()
+
+mockFn('arg')
+expect(mockFn).toHaveBeenCalled()
+expect(mockFn).toHaveBeenCalledTimes(1)
+expect(mockFn).toHaveBeenCalledWith('arg')
+expect(mockFn).toHaveBeenLastCalledWith('arg')
+
+WHEN TO USE:
+- Use for event handlers, API calls, custom hooks.
+- Good for verifying side-effects in frontend apps.
+
+===========================
+📌 ASYMMETRIC MATCHERS
+===========================
+
+1. expect.any(constructor)
+--------------------------
+expect(fn).toHaveBeenCalledWith(expect.any(Number))
+→ matches any value of given type (Number, String, Object).
+
+WHEN TO USE:
+- For flexible argument types in mocks.
+
+2. expect.anything()
+--------------------
+expect(fn).toHaveBeenCalledWith(expect.anything())
+→ matches anything but `null` or `undefined`.
+
+WHEN TO USE:
+- Use when value doesn’t matter, only that it exists.
+
+3. expect.arrayContaining(subArray)
+-----------------------------------
+expect([1,2,3]).toEqual(expect.arrayContaining([2,3]))
+→ checks if array contains all elements of sub-array.
+
+WHEN TO USE:
+- For partial matches in arrays (dropdown options, API results).
+
+4. expect.objectContaining(partialObject)
+-----------------------------------------
+expect({a:1, b:2, c:3}).toEqual(expect.objectContaining({a:1, b:2}))
+→ matches subset of object properties.
+
+WHEN TO USE:
+- For partial props/state/API response verification.
+
+5. expect.stringContaining(substring)
+-------------------------------------
+expect('frontend testing').toEqual(expect.stringContaining('front'))
+→ matches if string contains substring.
+
+WHEN TO USE:
+- For dynamic strings, messages, CSS class names.
+
+6. expect.stringMatching(regex)
+-------------------------------
+expect('openai.com').toEqual(expect.stringMatching(/\.com$/))
+→ matches if string satisfies regex.
+
+WHEN TO USE:
+- For email/URL validation, dynamic identifiers.
+
+===========================
+📌 RTL (jest-dom) MATCHERS
+===========================
+(Same as before...)
+
+===========================
+✅ MOST USED IN FRONTEND
+===========================
+- toBe → for primitives
+- toEqual → for objects/arrays
+- toContain → for array/string values
+- toHaveBeenCalledWith → for function calls
+- toBeInTheDocument → to check element render
+- toHaveTextContent → for text
+- toHaveClass → for styles
+- toBeDisabled → for form states
+- objectContaining / arrayContaining → partial matches
+
+===========================
+🔥 TOP 10 MATCHERS ONLY
+===========================
+1. toBe → primitive values
+2. toEqual → objects & arrays
+3. toContain → array/string includes
+4. toHaveProperty → object keys
+5. toThrow → error handling
+6. toHaveBeenCalledWith → mock function args
+7. toBeInTheDocument → element exists
+8. toHaveTextContent → text inside element
+9. toHaveClass → CSS classes
+10. expect.objectContaining → partial object match

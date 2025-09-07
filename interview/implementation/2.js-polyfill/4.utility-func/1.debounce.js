@@ -27,16 +27,13 @@ function debounce(func, wait, immediate) {
   let timeout;
   
   // Return the debounced function
-  return function() {
-    // Store the context and arguments for the function call
-    const context = this;
-    const args = arguments;
+  return function(...args) {
     
     // Function to execute after the delay
     const later = function() {
-      timeout = null;
+      timeout = null; // if immeadiate true it will just reset the timer.
       // If immediate is not true, call the function
-      if (!immediate) func.apply(context, args);
+      if (!immediate) func.apply(this, args);
     };
     
     // Determine if we should call the function immediately
@@ -54,7 +51,54 @@ function debounce(func, wait, immediate) {
   };
 }
 
+function simpleDebounce(func, wait) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer)
+    timer = setTimeout(()=>{
+      func.apply(this,args)
+    },wait)
+  }
+}
+
 // Export the function if in a CommonJS environment
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = debounce;
 }
+
+
+/*
+🔹 Difference with an example (wait = 1000ms)
+Case: Calls at 0ms, 500ms, 1000ms, 1500ms, 2000ms
+
+##Leading Debounce
+
+0ms → ✅ runs
+
+500ms → ❌ ignored (timer resets)
+
+1000ms → ❌ ignored (because timeout resets until 1000ms after last call)
+
+1500ms → ❌ ignored (timeout resets again)
+
+2000ms → ❌ ignored (timeout keeps resetting as long as calls keep happening!)
+
+3000ms -> works 
+
+👉 With continuous calls, leading debounce → only first call runs, rest ignored until you stop calling for wait ms.
+
+##Throttle
+
+0ms → ✅ runs
+
+500ms → ❌ ignored
+
+1000ms → ✅ runs
+
+1500ms → ❌ ignored
+
+2000ms → ✅ runs
+
+👉 With continuous calls, throttle → runs periodically every wait ms.
+
+*/

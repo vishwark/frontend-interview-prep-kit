@@ -1,0 +1,3 @@
+1/ uploading the data in multipart/form-data
+2/ converting the data to Base64 and sending it -- increases size by ~33%
+3/ uploading the providing the feedback using XHR request

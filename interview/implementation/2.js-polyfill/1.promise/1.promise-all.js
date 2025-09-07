@@ -3,12 +3,12 @@
  * 
  * Description:
  * This is a polyfill for the native Promise.all() method.
- * Promise.all() takes an iterable of promises as input and returns a single Promise.
+ * Promise.all() takes an iterable(array, set, generator, etc.) of promises as input and returns a single Promise.
  * This returned promise fulfills when all the input promises have fulfilled, with an array of the fulfillment values.
  * It rejects when any of the input promises rejects, with the first rejection reason.
  * 
  * Parameters:
- * - promises: An iterable (such as an array) of promises
+ * - promises: An iterable (such as an array/set/generators etc) of promises
  * 
  * Returns:
  * - A Promise that fulfills with an array of all the fulfillment values

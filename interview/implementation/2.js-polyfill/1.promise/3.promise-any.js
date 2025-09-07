@@ -8,7 +8,7 @@
  * It rejects when all of the input promises reject, with an AggregateError containing all rejection reasons.
  * 
  * Parameters:
- * - promises: An iterable (such as an array) of promises
+ * - promises: An iterable (such as an array/set/generators etc) of promises
  * 
  * Returns:
  * - A Promise that fulfills with the value of the first promise to fulfill
@@ -53,17 +53,18 @@ if (!Promise.any) {
             // If all promises have rejected, reject with AggregateError
             if (remainingPromises === 0) {
               // Use AggregateError if available, otherwise create a similar error object
-              const AggregateErrorConstructor = 
-                typeof AggregateError !== 'undefined' ? 
-                AggregateError : 
-                function(errors, message) {
-                  const error = new Error(message);
-                  error.name = 'AggregateError';
-                  error.errors = errors;
-                  return error;
-                };
               
-              reject(new AggregateErrorConstructor(errors, 'All promises were rejected'));
+              // const AggregateErrorConstructor = 
+              //   typeof AggregateError !== 'undefined' ? 
+              //   AggregateError : 
+              //   function(errors, message) {
+              //     const error = new Error(message);
+              //     error.name = 'AggregateError';
+              //     error.errors = errors;
+              //     return error;
+              //   };
+              
+              reject(new AggregateError(errors, 'All promises were rejected'));
             }
           });
       });

@@ -21,6 +21,7 @@
  * - If the array is modified during mapping, the callback will use the modified values
  * - Elements that don't exist when the map() method starts won't be visited
  * - If a thisArg parameter is provided, it will be used as the 'this' value for each callback invocation
+ * - skip the sparse array with in
  */
 
 if (!Array.prototype.map) {
