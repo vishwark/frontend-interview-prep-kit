@@ -74,8 +74,8 @@ function flattenObject(obj, prefix = '', delimiter = '.') {
   const result = {};
   
   // Process each key in the object
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+  for (const key in obj) { // for in includes enumerable keys from its prototype as well if it was created from another objct with Object.create(someObjWithEnumarable)
+    if (Object.prototype.hasOwnProperty.call(obj, key)) { // here using Object.prototype.hasOwnproperty.call method with that object to check the key, avoiding hasOwnPropery direcly if Object was created from null object, bare object or dictionary object
       const newKey = prefix ? `${prefix}${delimiter}${key}` : key;
       
       if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -87,9 +87,46 @@ function flattenObject(obj, prefix = '', delimiter = '.') {
       }
     }
   }
+
+  /* by using Object.entries which provides enumarable array of array [key,value], we can use Object.keys as well
+   // Process each key in the object
+  for (const [key,value] of Object.entries(obj)) {
+      const newKey = prefix ? `${prefix}${delimiter}${key}` : key;
+
+      if (typeof value === 'object' && value !== null) {
+        // Recursively flatten nested objects
+        Object.assign(result, flattenObject(value, newKey, delimiter));
+      } else {
+        // Add leaf values directly
+        result[newKey] = value;
+      }
+  }
+  */    
   
   return result;
 }
+
+// flatten object with reduce
+
+// function flattenObject(obj, prefix = '', delimiter = '.') {
+//   if (typeof obj !== 'object' || obj === null) {
+//     return {};
+//   }
+
+//   return Object.entries(obj).reduce((acc, [key, value]) => {
+//     const newKey = prefix ? `${prefix}${delimiter}${key}` : key;
+
+//     if (typeof value === 'object' && value !== null) {
+//       // Recursively flatten and merge into acc
+//       Object.assign(acc, flattenObject(value, newKey, delimiter));
+//     } else {
+//       acc[newKey] = value;
+//     }
+
+//     return acc;
+//   }, {});
+// }
+
 
 /**
  * Flatten Mixed Structure
