@@ -8,6 +8,61 @@
 
 This implementation focuses on creating functions that parse strings into integers without relying on JavaScript's built-in parsing functions.
 
+## Number Base Systems
+
+A **base system** (or **radix**) defines how many symbols (digits) are used to represent numbers.
+
+### Available Base Systems
+
+#### **Base-2 (Binary)**
+- **Symbols**: 0, 1
+- **Used in**: Computers, digital systems
+- **Example**: 101 (binary) = 5 (decimal)
+
+#### **Base-8 (Octal)**
+- **Symbols**: 0-7
+- **Used in**: Older computer systems
+- **Example**: 12 (octal) = 10 (decimal)
+
+#### **Base-10 (Decimal)**
+- **Symbols**: 0-9
+- **Used in**: Everyday arithmetic
+- **Example**: 254 (decimal) = 254 (decimal)
+
+#### **Base-16 (Hexadecimal)**
+- **Symbols**: 0-9, a-f (a = 10, b = 11, ..., f = 15)
+- **Used in**: Memory addresses, color codes
+- **Example**: 2F (hex) = 47 (decimal)
+
+#### **Base-36**
+- **Symbols**: 0-9, a-z
+- **Used in**: Compact representations (URLs, IDs)
+- **Example**: z (base-36) = 35 (decimal)
+
+### How Number Conversion Works
+
+When converting a number from any base to decimal, each digit's value is multiplied by the base raised to the power of its position (counting from right to left, starting at 0).
+
+For example, to convert the binary number `101` to decimal:
+- 1 × 2² = 1 × 4 = 4
+- 0 × 2¹ = 0 × 2 = 0
+- 1 × 2⁰ = 1 × 1 = 1
+- 1 × 2² + 0 × 2¹ + 1 × 2⁰ = 4 + 0 + 1 = 5
+- Sum: 4 + 0 + 1 = 5
+
+Similarly, to convert the hexadecimal number `2F` to decimal:
+- 2 × 16¹ = 2 × 16 = 32
+- F (15) × 16⁰ = 15 × 1 = 15
+- 2 × 16¹ + F (15) × 16⁰ = 32 + 15 = 47
+- Sum: 32 + 15 = 47
+
+### Summary
+- **Base-2 (Binary)** uses powers of 2: `2²`, `2¹`, `2⁰`
+- **Base-8 (Octal)** uses powers of 8: `8¹`, `8⁰`
+- **Base-10 (Decimal)** uses powers of 10: `10²`, `10¹`, `10⁰`
+- **Base-16 (Hexadecimal)** uses powers of 16: `16¹`, `16⁰`
+- **Base-36** uses powers of 36, with digits `0-9` and `a-z` for a total of 36 possible values.
+
 ### Parameters
 
 #### Parse Integer Function
