@@ -23,6 +23,7 @@
  * - If depth is 0 or negative, returns a shallow copy of the original array
  * - Non-array elements are preserved as-is
  */
+
 function flattenArray(arr, depth = Infinity) {
   // Validate input
   if (!Array.isArray(arr)) {
@@ -55,6 +56,7 @@ function flattenArray(arr, depth = Infinity) {
  * - obj: The object to flatten
  * - prefix (optional): A string prefix for keys (used in recursion)
  * - delimiter (optional): The character to use as a delimiter in the flattened keys (default: '.')
+ * - seen (optional): To keep track of the visited object to avoid the circular reference.
  * 
  * Returns:
  * - A new flattened object
@@ -62,9 +64,9 @@ function flattenArray(arr, depth = Infinity) {
  * Edge Cases:
  * - If input is not an object or is null, returns an empty object
  * - Arrays within objects are treated as objects with numeric keys
- * - Circular references are not handled (will cause stack overflow)
+ * - Circular references are not handled (will cause stack overflow). -- use the Weakset() to keep the reference
  */
-function flattenObject(obj, prefix = '', delimiter = '.') {
+function flattenObject(obj, prefix = '', delimiter = '.',) {
   // Validate input
   if (typeof obj !== 'object' || obj === null) {
     return {};
@@ -106,26 +108,30 @@ function flattenObject(obj, prefix = '', delimiter = '.') {
   return result;
 }
 
-// flatten object with reduce
+// flatten object with reduce with handling to circular reference
 
-// function flattenObject(obj, prefix = '', delimiter = '.') {
-//   if (typeof obj !== 'object' || obj === null) {
-//     return {};
-//   }
+function flattenObject(obj, prefix = '', delimiter = '.', seen = new WeakSet()) {
+  if (typeof obj !== 'object' || obj === null) {
+    return {};
+  }
 
-//   return Object.entries(obj).reduce((acc, [key, value]) => {
-//     const newKey = prefix ? `${prefix}${delimiter}${key}` : key;
+  if(seen.has(obj)) return {}
 
-//     if (typeof value === 'object' && value !== null) {
-//       // Recursively flatten and merge into acc
-//       Object.assign(acc, flattenObject(value, newKey, delimiter));
-//     } else {
-//       acc[newKey] = value;
-//     }
+  seen.add(obj)
 
-//     return acc;
-//   }, {});
-// }
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    const newKey = prefix ? `${prefix}${delimiter}${key}` : key;
+
+    if (typeof value === 'object' && value !== null) {
+      // Recursively flatten and merge into acc
+      Object.assign(acc, flattenObject(value, newKey, delimiter,seen));  // use assign for performance, instead of spread
+    } else {
+      acc[newKey] = value;
+    }
+
+    return acc;
+  }, {});
+}
 
 
 /**
