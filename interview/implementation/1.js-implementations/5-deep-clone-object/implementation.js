@@ -62,78 +62,51 @@ function basicDeepClone(obj) {
  * - Handles special object types like Date, RegExp, Map, Set
  * - Handles circular references
  */
-function advancedDeepClone(obj) {
-  // Keep track of visited objects to handle circular references
-  const visited = new WeakMap();
-  
-  function clone(item) {
-    // Handle primitive values and null
-    if (item === null || typeof item !== 'object') {
-      return item;
-    }
-    
-    // Handle circular references
-    if (visited.has(item)) {
-      return visited.get(item);
-    }
-    
-    // Handle Date objects
-    if (item instanceof Date) {
-      return new Date(item.getTime());
-    }
-    
-    // Handle RegExp objects
-    if (item instanceof RegExp) {
-      return new RegExp(item.source, item.flags);
-    }
-    
-    // Handle Map objects
-    if (item instanceof Map) {
-      const clonedMap = new Map();
-      visited.set(item, clonedMap);
-      item.forEach((value, key) => {
-        clonedMap.set(clone(key), clone(value));
-      });
-      return clonedMap;
-    }
-    
-    // Handle Set objects
-    if (item instanceof Set) {
-      const clonedSet = new Set();
-      visited.set(item, clonedSet);
-      item.forEach(value => {
-        clonedSet.add(clone(value));
-      });
-      return clonedSet;
-    }
-    
-    // Handle arrays
-    if (Array.isArray(item)) {
-      const clonedArray = [];
-      visited.set(item, clonedArray);
-      item.forEach((value, index) => {
-        clonedArray[index] = clone(value);
-      });
-      return clonedArray;
-    }
-    
-    // Handle objects
-    const clonedObj = Object.create(Object.getPrototypeOf(item));
-    visited.set(item, clonedObj);
-    
-    Object.getOwnPropertyNames(item).forEach(key => {
-      const descriptor = Object.getOwnPropertyDescriptor(item, key);
-      if (descriptor.value !== undefined) {
-        descriptor.value = clone(descriptor.value);
-      }
-      Object.defineProperty(clonedObj, key, descriptor);
-    });
-    
-    return clonedObj;
+const advancedDeepCloned = (obj, seen = new WeakMap()) => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
   }
-  
-  return clone(obj);
-}
+
+  if (seen.has(obj)) return seen.get(obj);
+
+  let clone;
+
+  if (obj instanceof Date) {
+    clone = new Date(obj);
+  } else if (obj instanceof Map) {
+    clone = new Map();
+    seen.set(obj, clone);
+    obj.forEach((value, key) => {
+      clone.set(advancedDeepCloned(key, seen), advancedDeepCloned(value, seen));
+    });
+  } else if (obj instanceof Set) {
+    clone = new Set();
+    seen.set(obj, clone);
+    obj.forEach((value) => {
+      clone.add(advancedDeepCloned(value, seen));
+    });
+  } else if (Array.isArray(obj)) {
+    clone = [];
+    seen.set(obj, clone);
+    obj.forEach((value, index) => {
+      clone[index] = advancedDeepCloned(value, seen);
+    });
+  } else {
+    clone = {};
+    seen.set(obj, clone);
+    Object.entries(obj).forEach(([key, value]) => {
+      clone[key] = advancedDeepCloned(value, seen);
+    });
+
+    // Handle symbol keys too
+    Object.getOwnPropertySymbols(obj).forEach((sym) => {
+      clone[sym] = advancedDeepCloned(obj[sym], seen);
+    });
+  }
+
+  return clone;
+};
+
 
 /**
  * JSON Deep Clone
