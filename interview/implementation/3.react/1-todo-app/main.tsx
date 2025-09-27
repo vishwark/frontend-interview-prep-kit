@@ -23,11 +23,16 @@ type FilterType = 'all' | 'active' | 'completed';
  */
 const TodoApp: React.FC = () => {
   // State for todos
-  const [todos, setTodos] = useState<Todo[]>(() => {
-    // Try to load todos from localStorage
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  // Load todos from localStorage on client-side only
+  useEffect(() => {
+    // This code only runs on the client after the component mounts
     const savedTodos = localStorage.getItem('todos');
-    return savedTodos ? JSON.parse(savedTodos) : [];
-  });
+    if (savedTodos) {
+      setTodos(JSON.parse(savedTodos));
+    }
+  }, []);
   
   // State for the new todo input
   const [newTodo, setNewTodo] = useState('');
