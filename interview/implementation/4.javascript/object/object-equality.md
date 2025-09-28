@@ -154,132 +154,206 @@ Deep equality recursively checks if two objects have the same structure and valu
 ```javascript
 /**
  * Checks if two values are deeply equal (including nested objects and arrays)
+ * This implementation is inspired by Lodash's isEqual function
  * 
- * @param {any} val1 - First value to compare
- * @param {any} val2 - Second value to compare
- * @param {Map} [visited=new Map()] - Map to track visited objects (for circular references)
+ * @param {any} a - First value to compare
+ * @param {any} b - Second value to compare
+ * @param {WeakMap} [seen=new WeakMap()] - WeakMap to track visited objects (for circular references)
  * @returns {boolean} - True if values are deeply equal, false otherwise
- * 
- * Edge cases handled:
- * - Primitive values
- * - Different types
- * - Arrays with same values but different order
- * - Special values like NaN, -0/+0
- * - Date objects
- * - RegExp objects
- * - Circular references
- * - Maps and Sets
  */
-function deepEqual(val1, val2, visited = new Map()) {
-  // Handle primitive types and special cases
-  if (Object.is(val1, val2)) {
-    return true;
-  }
-  
-  // If either is not an object or null, they're not equal (since Object.is already checked)
-  if (typeof val1 !== 'object' || val1 === null || 
-      typeof val2 !== 'object' || val2 === null) {
-    return false;
-  }
-  
-  // Handle circular references
-  if (visited.has(val1)) {
-    return visited.get(val1) === val2;
-  }
-  
-  // Track this pair to handle circular references
-  visited.set(val1, val2);
-  
-  // Handle different object types
-  const type1 = Object.prototype.toString.call(val1);
-  const type2 = Object.prototype.toString.call(val2);
-  
-  // If they're different types of objects, they're not equal
-  if (type1 !== type2) {
-    return false;
-  }
-  
-  // Handle Date objects
-  if (val1 instanceof Date) {
-    return val1.getTime() === val2.getTime();
-  }
-  
-  // Handle RegExp objects
-  if (val1 instanceof RegExp) {
-    return val1.toString() === val2.toString();
-  }
-  
-  // Handle Arrays
-  if (Array.isArray(val1)) {
-    if (val1.length !== val2.length) {
-      return false;
-    }
+const isEqual = (a, b, seen = new WeakMap()) => {
+    // Fast path for primitives and same references using Object.is
+    // Handles special cases like NaN === NaN and -0 !== +0
+    if (Object.is(a, b)) return true;
+
+    // If either is not an object or null, they're not equal
+    // (since Object.is already checked primitive equality)
+    if (typeof a !== 'object' || a === null ||
+        typeof b !== 'object' || b === null) return false;
+
+    // Handle circular references by checking if we've seen this pair before
+    if (seen.has(a) && seen.get(a) === b) return true;
     
-    for (let i = 0; i < val1.length; i++) {
-      if (!deepEqual(val1[i], val2[i], new Map(visited))) {
-        return false;
-      }
-    }
+    // Track this pair to handle circular references in nested structures
+    seen.set(a, b);
+
+    // Get the object type tags using toString (more reliable than instanceof)
+    // This helps differentiate between arrays, plain objects, dates, etc.
+    const tagA = Object.prototype.toString.call(a);
+    const tagB = Object.prototype.toString.call(b);
     
-    return true;
-  }
-  
-  // Handle Maps
-  if (val1 instanceof Map) {
-    if (val1.size !== val2.size) {
-      return false;
+    // If they're different types of objects, they're not equal
+    if (tagA !== tagB) return false;
+
+    // Handle different object types with specific comparison logic
+    switch (tagA) {
+        case '[object Array]': {
+            // Arrays must have the same length
+            if (a.length !== b.length) return false;
+            
+            // Compare each element in order (arrays are ordered collections)
+            for (let i = 0; i < a.length; i++) {
+                // Lodash treats array holes as undefined
+                if (!isEqual(a[i], b[i], seen)) return false;
+            }
+            return true;
+        }
+
+        case '[object Object]': {
+            // Get all keys including symbols
+            const keysA = [...Object.keys(a), ...Object.getOwnPropertySymbols(a)];
+            const keysB = [...Object.keys(b), ...Object.getOwnPropertySymbols(b)];
+
+            // Objects must have the same number of properties
+            if (keysA.length !== keysB.length) return false;
+
+            // Check each key in a exists in b with equal values
+            for (let key of keysA) {
+                if (!keysB.includes(key) || !isEqual(a[key], b[key], seen)) return false;
+            }
+            return true;
+        }
+
+        case '[object Date]':
+            // Compare dates by their time value
+            return a.getTime() === b.getTime();
+
+        case '[object RegExp]':
+            // Compare regexps by their source pattern and flags
+            return a.source === b.source && a.flags === b.flags;
+
+        case '[object Set]': {
+            // Sets must have the same size
+            if (a.size !== b.size) return false;
+
+            // Convert set b to array for easier comparison
+            const bValues = [...b];
+            // Track matched elements to avoid duplicate matches
+            const matched = new Set();
+
+            // For each value in set a, find a matching value in set b
+            for (let valA of a) {
+                let found = false;
+
+                // Try to find an unmatched element in b that equals the current element in a
+                for (let i = 0; i < bValues.length; i++) {
+                    // Skip already matched elements
+                    if (matched.has(i)) continue;
+                    
+                    // If we find a match, mark it as matched and stop searching
+                    if (isEqual(valA, bValues[i], seen)) {
+                        matched.add(i);
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If no match found for this element, sets are not equal
+                if (!found) return false;
+            }
+
+            return true;
+        }
+
+        case '[object Map]': {
+            // Maps must have the same size
+            if (a.size !== b.size) return false;
+
+            // Convert map b to entries array for easier comparison
+            const bEntries = [...b.entries()];
+            // Track matched entries to avoid duplicate matches
+            const matched = new Set();
+
+            // For each entry in map a, find a matching entry in map b
+            for (let [keyA, valA] of a.entries()) {
+                let found = false;
+
+                // Try to find an unmatched entry in b that equals the current entry in a
+                for (let i = 0; i < bEntries.length; i++) {
+                    // Skip already matched entries
+                    if (matched.has(i)) continue;
+                    
+                    const [keyB, valB] = bEntries[i];
+                    
+                    // Both key and value must be equal for map entries
+                    if (isEqual(keyA, keyB, seen) && isEqual(valA, valB, seen)) {
+                        matched.add(i);
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If no match found for this entry, maps are not equal
+                if (!found) return false;
+            }
+
+            return true;
+        }
+
+        // For other object types, default to false
+        // This could be extended to handle other types like TypedArrays, etc.
+        default:
+            return false;
     }
+};
+```
+
+### Limitations and How to Handle Them
+
+This deep equality implementation has several limitations that should be considered:
+
+1. **Performance with Large Objects**:
+   - **Limitation**: Deep comparison can be CPU-intensive for large nested structures.
+   - **Solution**: Consider implementing a depth limit parameter or using memoization for frequently compared objects.
+
+2. **Special Object Types**:
+   - **Limitation**: The current implementation handles Arrays, Objects, Dates, RegExps, Sets, and Maps, but not other specialized objects like TypedArrays, Promises, or custom class instances.
+   - **Solution**: Extend the switch statement to handle additional object types or add a customizer function parameter that allows custom comparison logic.
+
+3. **Property Descriptors**:
+   - **Limitation**: Property attributes (enumerable, configurable, writable) and getters/setters are not compared.
+   - **Solution**: Use Object.getOwnPropertyDescriptors() to compare property descriptors if needed.
+
+4. **Prototype Chain**:
+   - **Limitation**: The prototype chain is not considered in the comparison.
+   - **Solution**: Add an option to compare constructor properties or the entire prototype chain.
+
+5. **Symbol Properties**:
+   - **Limitation**: While the implementation includes symbol keys, it doesn't distinguish between enumerable and non-enumerable symbol properties.
+   - **Solution**: Use Object.getOwnPropertySymbols() with filtering for more precise control.
+
+6. **WeakMap vs Map for Circular References**:
+   - **Limitation**: Using WeakMap prevents memory leaks but doesn't work with primitive keys.
+   - **Solution**: The current implementation is optimal for object comparisons, but could be modified to use Map if primitive keys need to be tracked.
+
+7. **Error Objects**:
+   - **Limitation**: Error objects have non-enumerable properties like stack traces that aren't compared.
+   - **Solution**: Add special handling for Error objects to compare their message, name, and other relevant properties.
+
+8. **Function Comparison**:
+   - **Limitation**: Functions are compared by reference, not by their code or behavior.
+   - **Solution**: For function comparison, consider options like comparing function.toString() or treating all functions as equal based on use case.
+
+### Example Implementation with Extended Features
+
+To address some of these limitations, you could extend the isEqual function:
+
+```javascript
+const isEqualExtended = (a, b, options = {}, seen = new WeakMap()) => {
+    // Default options
+    const {
+        comparePrototypes = false,
+        compareFunctions = 'reference', // 'reference', 'toString', or 'always'
+        maxDepth = Infinity,
+        currentDepth = 0
+    } = options;
     
-    for (const [key, value] of val1) {
-      // Check if val2 has the key and if the values are deeply equal
-      if (!val2.has(key) || !deepEqual(value, val2.get(key), new Map(visited))) {
-        return false;
-      }
-    }
+    // Depth limit check
+    if (currentDepth > maxDepth) return true;
     
-    return true;
-  }
-  
-  // Handle Sets
-  if (val1 instanceof Set) {
-    if (val1.size !== val2.size) {
-      return false;
-    }
-    
-    // Convert sets to arrays for comparison
-    const arr1 = Array.from(val1);
-    const arr2 = Array.from(val2);
-    
-    // For each item in arr1, find a matching item in arr2
-    for (const item1 of arr1) {
-      // Try to find a matching item in arr2
-      const found = arr2.some(item2 => deepEqual(item1, item2, new Map(visited)));
-      if (!found) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-  
-  // Handle plain objects
-  const keys1 = Object.keys(val1);
-  const keys2 = Object.keys(val2);
-  
-  if (keys1.length !== keys2.length) {
-    return false;
-  }
-  
-  // Check if all keys in val1 exist in val2 with deeply equal values
-  for (const key of keys1) {
-    if (!Object.prototype.hasOwnProperty.call(val2, key) || 
-        !deepEqual(val1[key], val2[key], new Map(visited))) {
-      return false;
-    }
-  }
-  
-  return true;
-}
+    // Rest of the implementation with added options...
+    // (similar to isEqual but with the extended features)
+};
 ```
 
 ### Examples
