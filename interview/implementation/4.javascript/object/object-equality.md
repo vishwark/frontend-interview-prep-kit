@@ -2,6 +2,66 @@
 
 This document covers implementations of shallow and deep equality checks for JavaScript objects.
 
+## Built-in Methods for Object Equality
+
+JavaScript provides several built-in operators and methods for checking equality, each with its own advantages and limitations:
+
+### Equality Operators
+
+1. **Loose Equality (==)**
+   - Syntax: `a == b`
+   - Performs type coercion before comparison
+   - Limitations:
+     - Unpredictable results due to type coercion
+     - `null == undefined` returns true
+     - `'0' == 0` returns true
+     - Cannot distinguish between -0 and +0
+     - Not suitable for object comparison (compares references only)
+
+2. **Strict Equality (===)**
+   - Syntax: `a === b`
+   - No type coercion, types must match
+   - Limitations:
+     - NaN !== NaN (returns false when comparing NaN with itself)
+     - -0 === +0 (cannot distinguish between negative and positive zero)
+     - Only compares object references, not their contents
+     - Arrays and objects with identical contents but different references return false
+
+3. **Object.is()**
+   - Syntax: `Object.is(a, b)`
+   - Similar to === but with improved handling of edge cases
+   - Advantages:
+     - NaN is equal to NaN
+     - -0 is not equal to +0
+   - Limitations:
+     - Still only compares object references, not their contents
+     - No deep equality checking for nested objects
+
+### Object Comparison Methods
+
+1. **JSON.stringify() Comparison**
+   - Syntax: `JSON.stringify(obj1) === JSON.stringify(obj2)`
+   - Simple way to compare object contents
+   - Limitations:
+     - Doesn't work with circular references
+     - Ignores undefined values and functions
+     - Order of properties matters
+     - Cannot distinguish between different object types with same JSON representation
+     - Converts dates to strings
+
+2. **Lodash isEqual()**
+   - Syntax: `_.isEqual(obj1, obj2)`
+   - Performs deep equality comparison
+   - Advantages:
+     - Handles nested objects and arrays
+     - Compares values rather than references
+     - Handles special cases like dates, regexps, etc.
+   - Limitations:
+     - Requires external library
+     - May have performance implications for large objects
+
+The implementations in this document provide more control and handle edge cases that built-in methods don't address.
+
 ## 1. Shallow Equal
 
 Shallow equality checks if two objects have the same keys and values at the top level only (no nested deep check).
