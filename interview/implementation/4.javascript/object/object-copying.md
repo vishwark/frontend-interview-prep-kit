@@ -2,9 +2,84 @@
 
 This document covers implementations of shallow and deep copying techniques for JavaScript objects.
 
+## Built-in Methods for Object Copying
+
+JavaScript provides several built-in methods for copying objects, each with its own advantages and limitations:
+
+### Shallow Copy Methods
+
+1. **Object.assign()**
+   - Syntax: `Object.assign(target, ...sources)`
+   - Copies all enumerable own properties from source objects to target object
+   - Limitations:
+     - Only creates a shallow copy (nested objects are shared references)
+     - Doesn't copy non-enumerable properties
+     - Doesn't handle prototype chain
+     - Doesn't properly copy special objects like Date, RegExp, etc.
+
+2. **Spread Operator (...)**
+   - Syntax: `{...obj}` or `[...array]`
+   - Creates a new object/array with properties from the original
+   - Limitations:
+     - Only creates a shallow copy (same limitations as Object.assign)
+     - Only works on iterable objects for arrays
+     - More concise but functionally similar to Object.assign for objects
+
+3. **Array.slice()**
+   - Syntax: `array.slice()`
+   - Creates a shallow copy of an array
+   - Limitations:
+     - Only works for arrays
+     - Only creates a shallow copy (nested objects are shared)
+
+### Deep Copy Methods
+
+1. **JSON.parse(JSON.stringify())**
+   - Syntax: `JSON.parse(JSON.stringify(obj))`
+   - Creates a deep copy by serializing to JSON and parsing back
+   - Limitations:
+     - Doesn't handle circular references (throws error)
+     - Loses functions, undefined values, and symbols
+     - Converts Date objects to strings
+     - Doesn't preserve Maps, Sets, RegExp, etc.
+     - Can be slow for large objects
+
+2. **structuredClone()** (Modern browsers)
+   - Syntax: `structuredClone(obj)`
+   - Creates a deep copy using the structured clone algorithm
+   - Advantages:
+     - Handles circular references
+     - Preserves most built-in types (Date, RegExp, Map, Set, etc.)
+   - Limitations:
+     - Doesn't copy functions
+     - Relatively new, not available in older browsers
+     - Not as widely supported as other methods
+
+The implementations in this document provide more control and handle edge cases that built-in methods don't address.
+
 ## 1. Shallow Copy
 
 Shallow copying creates a new object with copies of the top-level properties, but nested objects are still shared references.
+
+### Using for...in Loop
+
+```javascript
+/**
+ * Creates a shallow copy of an object using a for...in loop
+ * 
+ * @param {Object} obj - Object to copy
+ * @returns {Object} - A new object with the same top-level properties
+ */
+function shallowCopy(obj) {
+  if (typeof obj !== 'object' || obj === null) return obj;
+  
+  const result = Array.isArray(obj) ? [] : {};
+  for (let key of Object.keys(obj)) {
+    result[key] = obj[key];
+  }
+  return result;
+}
+```
 
 ### Using Spread Operator
 
