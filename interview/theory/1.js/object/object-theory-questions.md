@@ -77,9 +77,9 @@ console.log(shallowEqual(a, c)); // true (address objects have the same referenc
 While `JSON.stringify` can be used for simple deep equality checks, it has several limitations:
 
 1. It doesn't handle circular references (throws an error)
-2. It ignores functions and undefined values
+2. It ignores functions , undefined & Symbol values
 3. It converts special values like `NaN` and `Infinity` to `null`
-4. It doesn't preserve object types like `Date`, `Map`, `Set` (converts them to strings or objects)
+4. It doesn't preserve object types like `Date`(converted to string), `Map`(converted to {}), `Set`(converted to {}) (converts them to strings or objects)
 5. The order of properties in the resulting string can affect comparison results
 
 **Example:**
@@ -150,40 +150,29 @@ A robust `deepEqual` function needs to:
 
 **Implementation:**
 ```javascript
-function deepEqual(a, b, visited = new Map()) {
-  // Handle primitive types and simple cases
+function deepEqual(a, b, visited = new WeakMap()) {
+  // Handle primitives and identical references
   if (Object.is(a, b)) return true;
-  
-  // If either isn't an object or is null
-  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
+
+  if (typeof a !== "object" || a === null ||
+      typeof b !== "object" || b === null) {
     return false;
   }
-  
+
   // Handle circular references
-  if (visited.has(a)) {
-    return visited.get(a) === b;
-  }
+  if (visited.has(a)) return visited.get(a) === b;
   visited.set(a, b);
-  
-  // Handle dates
-  if (a instanceof Date && b instanceof Date) {
-    return a.getTime() === b.getTime();
-  }
-  
-  // Handle regular expressions
-  if (a instanceof RegExp && b instanceof RegExp) {
-    return a.toString() === b.toString();
-  }
-  
-  // Handle arrays
+
+  // Handle special objects
+  if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
+  if (a instanceof RegExp && b instanceof RegExp) return a.toString() === b.toString();
+
+  // Handle Arrays
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!deepEqual(a[i], b[i], visited)) return false;
-    }
-    return true;
+    return a.every((item, i) => deepEqual(item, b[i], visited));
   }
-  
+
   // Handle Maps
   if (a instanceof Map && b instanceof Map) {
     if (a.size !== b.size) return false;
@@ -192,28 +181,22 @@ function deepEqual(a, b, visited = new Map()) {
     }
     return true;
   }
-  
+
   // Handle Sets
   if (a instanceof Set && b instanceof Set) {
     if (a.size !== b.size) return false;
-    for (const item of a) {
-      if (!b.has(item)) return false;
+    for (const itemA of a) {
+      if (![...b].some(itemB => deepEqual(itemA, itemB, visited))) return false;
     }
     return true;
   }
-  
+
   // Handle plain objects
   const keysA = Object.keys(a);
   const keysB = Object.keys(b);
-  
   if (keysA.length !== keysB.length) return false;
-  
-  for (const key of keysA) {
-    if (!keysB.includes(key)) return false;
-    if (!deepEqual(a[key], b[key], visited)) return false;
-  }
-  
-  return true;
+
+  return keysA.every(key => keysB.includes(key) && deepEqual(a[key], b[key], visited));
 }
 ```
 
