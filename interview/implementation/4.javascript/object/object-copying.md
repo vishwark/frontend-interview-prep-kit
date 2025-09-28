@@ -128,6 +128,40 @@ function basicDeepCopy(value) {
   
   return result;
 }
+
+/**
+ * Creates a deep copy of an object or value with basic circular reference handling
+ * 
+ * @param {any} value - Value to deep copy
+ * @param {WeakMap} [seen=new WeakMap()] - WeakMap to track visited objects
+ * @returns {any} - A new deeply copied value
+ */
+function basicCopyWithCircular(value, seen = new WeakMap()) {
+  // Handle primitive types
+  if (value === null || typeof value !== 'object') {
+    return value;
+  }
+  
+  // Handle circular references
+  if (seen.has(value)) {
+    return seen.get(value);
+  }
+  
+  // Create new instance based on type
+  const result = Array.isArray(value) ? [] : {};
+  
+  // Store reference before recursing
+  seen.set(value, result);
+  
+  // Copy properties recursively
+  for (const key in value) {
+    if (Object.prototype.hasOwnProperty.call(value, key)) {
+      result[key] = basicCopyWithCircular(value[key], seen);
+    }
+  }
+  
+  return result;
+}
 ```
 
 ### Complete Implementation
@@ -351,6 +385,36 @@ function deepCopyWithCircular(value, visited = new Map()) {
   }
   
   return result;
+}
+
+/**
+ * Alternative implementation of deep copy with circular references using reduce
+ * 
+ * @param {any} obj - Object to deep copy
+ * @param {WeakMap} [seen=new WeakMap()] - WeakMap to track visited objects
+ * @returns {any} - A new deeply copied value
+ */
+function deepCopyWithCircular2(obj, seen = new WeakMap()) {
+  // Handle primitive types
+  if (typeof obj !== 'object' || obj === null) return obj;
+  
+  // Handle circular references
+  if (seen.has(obj)) return seen.get(obj);
+  
+  // Create new instance based on type
+  const clone = Array.isArray(obj) ? [] : {};
+  seen.set(obj, clone);
+  
+  // Handle array specially for better performance
+  if (Array.isArray(obj)) {
+    return obj.map(el => deepCopyWithCircular2(el, seen));
+  }
+  
+  // Handle plain objects using reduce
+  return Object.keys(obj).reduce((acc, key) => {
+    acc[key] = deepCopyWithCircular2(obj[key], seen);
+    return acc;
+  }, clone);
 }
 ```
 
