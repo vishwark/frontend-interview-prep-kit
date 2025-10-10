@@ -96,14 +96,14 @@ function useMediaQuery(query, options = {}) {
  * Predefined media queries for common breakpoints
  */
 export const breakpoints = {
-  // Mobile first queries
-  sm: '(min-width: 640px)',
-  md: '(min-width: 768px)',
-  lg: '(min-width: 1024px)',
-  xl: '(min-width: 1280px)',
+  // Desktop-first (min-width) breakpoints
+  sm: '(min-width: 640px)', 
+  md: '(min-width: 768px)', 
+  lg: '(min-width: 1024px)', 
+  xl: '(min-width: 1280px)', 
   '2xl': '(min-width: 1536px)',
   
-  // Desktop first queries
+  // Mobile-first (max-width) breakpoints
   maxSm: '(max-width: 639px)',
   maxMd: '(max-width: 767px)',
   maxLg: '(max-width: 1023px)',
@@ -116,9 +116,9 @@ export const breakpoints = {
   
   // Display features
   retina: '(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)',
-  darkMode: '(prefers-color-scheme: dark)',
-  lightMode: '(prefers-color-scheme: light)',
-  reducedMotion: '(prefers-reduced-motion: reduce)',
+  darkMode: '(prefers-color-scheme: dark)', // '(prefers-color-scheme: dark)'
+  lightMode: '(prefers-color-scheme: light)',//  '(prefers-color-scheme: light)'
+  reducedMotion: '(prefers-reduced-motion: reduce)', // '(prefers-reduced-motion: reduce)'
   
   // Interaction
   hover: '(hover: hover)',
