@@ -60,6 +60,7 @@ const useFetch = (url, options= {}) => {
         }
     },[url,headers, method,body,retryCount,retryDelay,currenRetryCount,fetchOptions])
 
+    //useffect to trigger at mount & cleanup to stop the pending api calls during unmount & stop retries
     useEffect(()=> {
         fetchData();
         return () =>{
