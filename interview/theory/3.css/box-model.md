@@ -218,4 +218,4 @@ Use browser DevTools → "Layout" or "Box Model" panel to visualize:
 
 ## 📊 Visual Reference
 
-![CSS Box Model Mindmap](./assets/css-box-model-mindmap.png)
+![CSS Box Model Mindmap](./assets/css-box-model-mindmap1.png)
