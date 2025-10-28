@@ -64,3 +64,9 @@ Flexbox (Flexible Box Layout) is a CSS layout model that allows elements to be a
   e.g. `flex: 1 1 200px;`
 
 - To override alignment for a single flex item, use `align-self` (e.g. `align-self: center;`).
+
+---
+
+## 📊 Visual Reference
+
+![CSS Flexbox Mindmap](./assets/css-flex-mindmap.png)

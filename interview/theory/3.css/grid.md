@@ -59,3 +59,9 @@ At the container level, we set:
 
 - `place-content` → moves the grid as a whole inside the container.
 - `place-items` → centers each item inside its own grid cell.
+
+---
+
+## 📊 Visual Reference
+
+![CSS Grid Mindmap](./assets/css-grid-mindmap.png)
