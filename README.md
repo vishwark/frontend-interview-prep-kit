@@ -1,6 +1,17 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Frontend Interview Prep Kit
+
+A comprehensive collection of interview preparation materials for frontend developers, including theory, implementations, system design, and real interview questions.
+
+## 📊 Interview Questions Database
+
+Questions extracted from **50+ real interviews**:
+- [Interview Questions Spreadsheet](https://docs.google.com/spreadsheets/d/1wYp0Q4dOyftfrJJo9ZnCr1FGn98vB_XcJNIjywYZTmQ/edit?gid=2100091529#gid=2100091529)
+
+---
 
 ## Getting Started
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 First, run the development server:
 
